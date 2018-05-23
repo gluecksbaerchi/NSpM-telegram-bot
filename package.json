@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.16.1",
-    "express": "^4.14.1"
+    "express": "^4.14.1",
+    "shelljs": "^0.8.2",
+    "sparql-client-2": "^0.6.2"
   }
 }
