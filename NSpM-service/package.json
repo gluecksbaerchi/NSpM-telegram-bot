@@ -13,5 +13,9 @@
     "express": "^4.14.1",
     "shelljs": "^0.8.2",
     "sparql-client-2": "^0.6.2"
+  },
+  "repository": {
+    "type": "ssh",
+    "url": "ssh://git@gitlab.imn.htwk-leipzig.de:2244/cguempel/NSpM-webhook.git"
   }
 }

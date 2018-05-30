@@ -38,16 +38,24 @@ app.post('/webhook', (req, res) => {
             if (response.boolean !== undefined) {
                 displayText = response.boolean === true ? 'Yes' : 'No';
             }
-            if (response.results !== undefined && response.results.bindings !== undefined) {
+
+            if (response.results !== undefined && response.results.bindings !== undefined && response.results.bindings.length > 0) {
+
                 console.log(response.results.bindings);
-                let resultInPreferedLanguageFound = false;
+
+                let resultFound = false;
                 response.results.bindings.forEach(function (result) {
-                    if (result['a']['xml:lang'] === preferedLanguage) {
-                        displayText = result['a']['value'];
-                        resultInPreferedLanguageFound = true;
+                    if (result['a']['type'] === 'uri') {
+                        // todo: call resource
+                        //resultFound = true;
+                    } else {
+                        if (result['a']['xml:lang'] === preferedLanguage) {
+                            displayText = result['a']['value'];
+                            resultFound = true;
+                        }
                     }
                 });
-                if (!resultInPreferedLanguageFound) {
+                if (!resultFound) {
                     displayText = response.results.bindings[0]['a']['value'];
                 }
             }
