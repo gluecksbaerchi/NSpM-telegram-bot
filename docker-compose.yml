@@ -5,7 +5,7 @@ services:
     command: node index.js
     volumes:
       - ./NSpM-service:/usr/app/
-      - ../NSpM:/usr/NSpM/
+      - ./NSpM-project:/usr/NSpM/
       - /usr/app/node_modules
     ports:
       - "5000:5000"

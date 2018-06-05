@@ -1,0 +1,1 @@
+ask where brack_open dbr_Carew_Cross rdf_type dbo_Place brack_close
