@@ -21,7 +21,11 @@ services:
       - nspm
 
   ngrok:
+    container_name: ngrok
+    ports:
+      - "0.0.0.0:4040:4040"
     image: wernight/ngrok
     links:
-      - telegram
-    command: “ngrok http telegram:8080”
+      - "telegram"
+    environment:
+      - NGROK_PORT=telegram:8080
