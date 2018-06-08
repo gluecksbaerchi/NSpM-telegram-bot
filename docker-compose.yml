@@ -19,6 +19,8 @@ services:
     - "8080:8080"
     depends_on:
       - nspm
+    environment:
+      - BOT_TOKEN=491825766:AAFEJ0vsOmEOBJr_KRJOcY9OWCweuIqQgzo
 
   ngrok:
     container_name: ngrok

@@ -1,13 +1,12 @@
 process.env["NTBA_FIX_319"] = 1;
 
 var express = require('express');
-const token = '491825766:AAFEJ0vsOmEOBJr_KRJOcY9OWCweuIqQgzo';
 const http = require('http');
 
 var app = express();
 
 const TelegramBot = require('node-telegram-bot-api');
-const bot = new TelegramBot(token, {polling: true});
+const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
 
 var post_options = {
     host: 'nspm',
@@ -23,21 +22,28 @@ var post_options = {
 
 var post_data = '{"result": {"parameters": {"question": "is carew cross a place"}}}';
 
-bot.on('message', (msg) => {
-    var post_req = http.request(post_options, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            var json = JSON.parse(chunk);
-            bot.sendMessage(msg.chat.id,json.displayText);
-        });
+
+bot.onText(/\/start/, (msg) => {
+
+    bot.sendMessage(msg.chat.id,'Hey ' +  msg.from.first_name + ', what do you want to do?',{"reply_markup": {
+        "keyboard": [["Ask a Question", "Query DBpedia"],["Add some Training Data"]] }
     });
+});
 
-    post_req.write(post_data);
-    post_req.end();
-    console.log('huhu');
+bot.on('message', (msg) => {
 
+    switch(msg.text) {
+        case 'Ask a Question':
+            bot.sendMessage(msg.chat.id, 'Let´s go! Ask me anything!');
+            break;
+        case 'Query DBPedia':
+            break;
+        case 'Add some Training Data':
+            break;
+        default:
+    }
 });
 
 app.listen(8080, function () {
-
+    console.log("Server listening on port 8080")
 });
