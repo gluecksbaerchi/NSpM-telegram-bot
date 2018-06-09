@@ -1,15 +1,14 @@
 "use strict";
 
-const preferredLanguage = 'en';
-
 module.exports = class SparqlResponseService {
 
-    responseSuccess(response) {
-        let status = 'no_result';
-        let displayText = "I don't know. ¯\\_(ツ)_/¯";
-        let uris = [];
+    responseSuccess(response, preferredLanguage, query) {
+        let status = 'error';
+        let type = 'string';
+        let value = '';
         if (response.boolean !== undefined) {
-            displayText = response.boolean === true ? 'Yes' : 'No';
+            type = 'boolean';
+            value = response.boolean === true ? 1 : 0;
             status = 'ok';
         }
 
@@ -18,32 +17,37 @@ module.exports = class SparqlResponseService {
             let resultFound = false;
             response.results.bindings.forEach(function (result) {
                 if (result['a']['type'] === 'uri') {
-                    uris.push(result['a']['value']);
-                    displayText = 'Have a look at the uris.';
+                    if (typeof value === "string") {
+                        value = [];
+                        type = 'uri_list';
+                    }
+                    value.push(result['a']['value']);
                     resultFound = true;
                 } else {
                     if (result['a']['xml:lang'] === preferredLanguage) {
-                        displayText = result['a']['value'];
+                        value = result['a']['value'];
                         resultFound = true;
                     }
                 }
             });
             if (!resultFound) {
-                displayText = response.results.bindings[0]['a']['value'];
+                value = response.results.bindings[0]['a']['value'];
             }
         }
 
         return {
-            answer: displayText,
-            uris: uris,
+            query: query,
+            value: value,
+            type: type,
             status: status
         }
     }
 
-    responseError() {
+    responseError(query) {
         return {
-            answer: "An error occurs",
-            uris: [],
+            query: query,
+            value: "An error occurs",
+            type: "string",
             status: 'error'
         }
     }
