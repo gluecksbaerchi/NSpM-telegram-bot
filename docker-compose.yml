@@ -22,12 +22,5 @@ services:
     environment:
       - BOT_TOKEN=491825766:AAFEJ0vsOmEOBJr_KRJOcY9OWCweuIqQgzo
 
-  ngrok:
-    container_name: ngrok
-    ports:
-      - "0.0.0.0:4040:4040"
-    image: wernight/ngrok
-    links:
-      - "telegram"
-    environment:
-      - NGROK_PORT=telegram:8080
+
+
