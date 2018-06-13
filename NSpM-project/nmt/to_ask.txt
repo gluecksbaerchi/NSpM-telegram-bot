@@ -1,1 +1,1 @@
-is carew cross a place
+SELECT ?a WHERE{dbr:Dewey_Monument dct:subject ?a }

@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.3",
-    "ngrok": "^3.0.1",
-    "node-telegram-bot-api": "^0.30.0",
-    "telegraf": "^3.21.2"
+    "request": "^2.87.0",
+    "sparqljs": "^2.0.3",
+    "telegraf": "^3.21.2",
+    "telegraf-command-parts": "^1.0.3"
   }
 }
