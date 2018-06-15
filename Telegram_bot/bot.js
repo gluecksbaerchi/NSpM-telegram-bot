@@ -2,79 +2,83 @@ const Telegraf = require('telegraf');
 const Markup = require('telegraf/markup');
 const HTTP_Service = require('./Services/http_service');
 const commandParts = require('telegraf-command-parts');
-
+const session = require('telegraf/session');
 const bot = new Telegraf(process.env.BOT_TOKEN);
+const messages =require('./Services/message-service');
 
 bot.use(commandParts());
-
-const startMsg = `Welcome, you can use the following commands.
-/ask - Ask a Question
-/query - Query DBPedia
-/add - add Training data
-/cat - because everyone loves cats
-
-Tip: type /help to get to know the commands in more detail`;
+bot.use(session());
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
 bot.command('start', (ctx) => {
-    ctx.reply(startMsg);
+    ctx.reply(messages.start_msg);
 });
 
 bot.command('help', (ctx) => {
-    return ctx.reply('What do you want to do?',
+    return ctx.reply(messages.help_msg,
         Markup.inlineKeyboard([
-            Markup.callbackButton('Ask a Question', 'ask'),
-            Markup.callbackButton('Query DBPedia', 'query'),
-            Markup.callbackButton('Add training data', 'add')
+            Markup.callbackButton(messages.inline_ask_msg, 'ask'),
+            Markup.callbackButton(messages.inline_query_msg, 'query'),
         ]).extra()
     )
 });
 
 bot.action('ask', (ctx) => {
-    return ctx.answerCbQuery(`type /ask followed by your question`, true)
+    return ctx.answerCbQuery(messages.inline_ask_answer, true)
 });
 
 bot.action('query', (ctx) => {
-    return ctx.answerCbQuery(`type /query followed by your SPARQL query. You don\'t need to define prefixes because DBPedia knows most of them.`, true)
+    return ctx.answerCbQuery(messages.inline_query_answer, true)
 });
 
-bot.action('add', (ctx) => {
-    return ctx.answerCbQuery(`type /add question - query`, true)
-});
 
 bot.command('cat', ({replyWithPhoto}) => replyWithPhoto('http://random.cat/view/' + getRandomInt(500)));
 
-bot.command('ask', (ctx) => {
+bot.command('ask', (ctx,next) => {
     if (ctx.state.command.args == '') {
-        ctx.reply('You need to tell me your question after /ask if you want me to answer.');
+        ctx.reply(messages.ask_param_msg);
     } else {
         HTTP_Service.post_question(ctx.state.command.args, function (err, body) {
 
             if (err || body.status == 'error') {
-                ctx.reply('Something went wrong. Maybe I can\'t answer your question.')
+                ctx.reply(messages.ask_err_msg)
             } else {
-                switch (body.type) {
-                    case 'boolean':
-                        ctx.reply(body.value ? 'Yes' : 'No');
-                        break;
-                    case 'string':
-                        ctx.reply(body.value);
-                        break;
-                    case 'uri_list':
-                        ctx.reply('Check those uris!')
-                        for (var i = 0; i < body.value.length; i++) {
-                            ctx.reply(body.value[i]);
-                        }
-                        break;
-                    default:
-                        ctx.reply('I have an answer but don\'t know how to present it to you.');
-                }
+                ctx.session.query = body.query;
+                ctx.session.question = ctx.state.command.args;
+                ctx.reply(messages.get_answer_by_type(body)).then(function(){
+                    ctx.reply(messages.training_msg,
+                        Markup.keyboard([
+                            Markup.callbackButton(messages.training_yes, 'true'),
+                            Markup.callbackButton(messages.training_no, 'false'),
+                        ]).oneTime()
+                            .resize()
+                            .extra()
+                    )
+                });
             }
         });
     }
+    return next();
+});
+
+bot.hears(messages.training_yes, (ctx) => {
+
+    HTTP_Service.post_training(ctx.session.question,ctx.session.query, function (err, body) {
+        if (!err || body.status != 'error')
+        {
+            ctx.reply(messages.training_answer_succes)
+        } else{
+            ctx.reply(messages.training_answer_fail)
+        }
+    });
+
+});
+
+bot.hears(messages.training_no, (ctx) => {
+    ctx.reply(messages.training_answer_no)
 });
 
 bot.command('query', (ctx) => {
@@ -85,32 +89,14 @@ bot.command('query', (ctx) => {
             HTTP_Service.post_query(ctx.state.command.args, function (err, body) {
 
                 if (err || body.status == 'error') {
-                    ctx.reply('Something went wrong. Maybe your query is wrong or to complex.')
+                    ctx.answer(messages.query_err_msg)
                 } else {
-                    switch (body.type) {
-                        case 'boolean':
-                            ctx.reply(body.value ? 'Yes' : 'No');
-                            break;
-                        case 'string':
-                            ctx.reply(body.value);
-                            break;
-                        case 'uri_list':
-                            ctx.reply('Check those uris!')
-                            for (var i = 0; i < body.value.length; i++) {
-                                ctx.reply(body.value[i]);
-                            }
-                            break;
-                        default:
-                            ctx.reply('I have an answer but don\'t know how to present it to you.');
-                    }
+                    ctx.reply(messages.get_answer_by_type(body));
                 }
             });
         }
 });
 
 bot.startPolling();
-
-
-
 
 module.exports = {};
