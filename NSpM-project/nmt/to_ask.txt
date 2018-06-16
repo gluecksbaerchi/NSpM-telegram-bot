@@ -1,1 +1,1 @@
-SELECT ?a WHERE{dbr:Dewey_Monument dct:subject ?a }
+is carew cross a monument

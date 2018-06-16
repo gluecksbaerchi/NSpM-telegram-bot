@@ -1,1 +1,1 @@
-select count par_open wildcard par_close where brack_open var_a rdf_type dbo_Place sep_dot var_a
+ask where brack_open dbr_Carew_Cross rdf_type dbo_Monument brack_close
