@@ -1,1 +1,1 @@
-ask where brack_open dbr_Carew_Cross rdf_type dbo_Monument brack_close
+select var_a where brack_open <unk> dbo_abstract var_a brack_close
