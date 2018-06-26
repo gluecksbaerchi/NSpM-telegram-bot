@@ -36,7 +36,7 @@ module.exports = class SparqlResponseService {
         }
 
         return {
-            query: query,
+            query: query.replace(/(\r\n|\n|\r)/gm,""),
             value: value,
             type: type,
             status: status

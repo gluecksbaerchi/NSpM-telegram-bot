@@ -15,11 +15,9 @@ module.exports = class NspmQuestionService {
         if (!fs.existsSync('../NSpM/data/collected_training_data')) {
             fs.mkdirSync('../NSpM/data/collected_training_data');
         }
-        fs.appendFile('../NSpM/data/collected_training_data/training_data.en', question + '\n', function (err) {
-            if (err) throw err;
-            fs.appendFile('../NSpM/data/collected_training_data/training_data.sparql', query + '\n', function (err) {
-                if (err) throw err;
-            });
-        });
+        fs.appendFile(
+            '../NSpM/data/collected_training_data/training_data.ensparql',
+            question + ' | ' + query + '\n'
+        );
     }
 };
