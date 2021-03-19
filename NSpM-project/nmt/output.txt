@@ -1,1 +1,1 @@
-select var_a where brack_open <unk> dbo_abstract var_a brack_close
+select var_a where brack_open dbr_Edward_VII_Monument_ par_open Montreal par_close dbo_location var_a brack_close
