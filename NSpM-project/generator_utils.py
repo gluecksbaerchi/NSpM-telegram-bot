@@ -1,11 +1,11 @@
 import collections
-import httplib
+import http.client
 import json
 import logging
 import re
 import sys
 import urllib
-import urllib2
+from urllib.request import urlopen
 
 ENDPOINT = "http://dbpedia.org/sparql"
 GRAPH = "http://dbpedia.org"
@@ -44,10 +44,10 @@ def query_dbpedia( query ):
     param["timeout"] = "600" # ten minutes - works with Virtuoso endpoints
     param["debug"] = "on"
     try:
-        resp = urllib2.urlopen(ENDPOINT + "?" + urllib.urlencode(param))
+        resp = urllib.request.urlopen(ENDPOINT + "?" + urllib.parse.urlencode(param))
         j = resp.read()
         resp.close()
-    except (urllib2.HTTPError, httplib.BadStatusLine):
+    except (urllib.error.HTTPError, http.client.BadStatusLine):
         logging.debug("*** Query error. Empty result set. ***")
         j = '{ "results": { "bindings": [] } }'
     sys.stdout.flush()
